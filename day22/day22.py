@@ -1,5 +1,5 @@
-from lib import part1, part2
 import csv
+from lib import part1, part2
 
 
 def read_rows(**kwargs):
