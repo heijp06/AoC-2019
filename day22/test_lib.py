@@ -18,4 +18,5 @@ def test_shuffle_example_4(card_number):
         ["deal", "with", "increment", "3"],
         ["cut", "-1"]
     ]
-    assert shuffle(actions, card_number, 10) == result_4.index(card_number)
+    scale, shift = shuffle(actions, 10)
+    assert (scale * card_number + shift) % 10 == result_4.index(card_number)
