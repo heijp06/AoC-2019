@@ -9,7 +9,7 @@ def part2(actions):
     number_of_shuffles = 101741582076661
     scale, shift = shuffle(actions, number_of_cards)
     scale, shift = repeat(scale, shift, number_of_shuffles, number_of_cards)
-    return ((2020 - shift) * pow(scale, -1, number_of_cards)) % number_of_cards
+    return (2020 - shift) * pow(scale, -1, number_of_cards) % number_of_cards
 
 
 def shuffle(actions, number_of_cards):
@@ -32,8 +32,8 @@ def shuffle(actions, number_of_cards):
 
 
 def repeat(scale, shift, number_of_shuffles, number_of_cards):
-    new_scale = pow(scale, number_of_shuffles, number_of_cards)
+    scale_power_shuffles = pow(scale, number_of_shuffles, number_of_cards)
     inv_scale_minus_one = pow(scale - 1, -1, number_of_cards)
-    new_shift = (shift * inv_scale_minus_one *
-                 (new_scale - 1)) % number_of_cards
-    return new_scale, new_shift
+    new_shift = shift * inv_scale_minus_one * \
+        (scale_power_shuffles - 1) % number_of_cards
+    return scale_power_shuffles, new_shift
