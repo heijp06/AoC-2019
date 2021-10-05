@@ -8,6 +8,6 @@ main :: IO ()
 main = hspecWith defaultConfig {configFastFail = True} specs
 
 specs :: Spec
-specs = do
-    describe "initialize" $ do
+specs =
+    describe "initialize" $
         it "length" $ length (initialize [99]) `shouldBe` 50
