@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9a9cdcd8ba8f80f50614281eb20be55b6b13a984cd1b31f586fdd4314e766fe0
+-- hash: aa0d1326e380694a241f4864d89dbe5e5809de874088cb56637c8a739c2a9671
 
 name:           day23
 version:        0.1.0.0
@@ -35,6 +35,8 @@ library
   build-depends:
       base >=4.7 && <5
     , containers
+    , intCode
+    , mtl
     , split
     , utils
   default-language: Haskell2010

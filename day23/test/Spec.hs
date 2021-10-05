@@ -9,5 +9,5 @@ main = hspecWith defaultConfig {configFastFail = True} specs
 
 specs :: Spec
 specs = do
-    describe "foo" $ do
-        it "foo" $ 1 `shouldBe` 1
+    describe "initialize" $ do
+        it "length" $ length (initialize [99]) `shouldBe` 50

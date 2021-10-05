@@ -24,6 +24,8 @@ library:
     - split
     - containers
     - utils
+    - intCode
+    - mtl
 executables:
   day23:
     main: Main.hs
