@@ -11,10 +11,10 @@ main = do
     print x
     clip x
 
-    -- putStr "Part two: "
-    -- let y = part2 xs
-    -- print y
-    -- clip y
+    putStr "Part two (13163 is wrong): "
+    let y = part2 xs
+    print y
+    clip y
 
 clip :: Show a => a -> IO ()
 clip = setClipboardString . show
