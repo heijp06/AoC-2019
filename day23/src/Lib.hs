@@ -9,6 +9,8 @@ import Data.Maybe (fromMaybe, isJust, maybe)
 import IntCode (Interpreter, Program, addInputs, empty, fromList, readOutputs, run)
 import Control.Monad.State (State, execState, get, put, runState)
 import qualified Data.Map as M
+import Debug.Trace (trace)
+import Text.Printf (printf)
 
 data Nat = Nat
     { value :: [Integer]
@@ -16,6 +18,10 @@ data Nat = Nat
     , func :: Maybe Integer -> Maybe Integer -> Maybe Integer
     , result :: Maybe Integer
     }
+
+instance Show Nat where
+    show nat = printf "Nat { value = %s, prevY = %s, result = %s }"
+        (show $ value nat) (show $ prevY nat) (show $ result nat)
 
 part1 :: [Integer] -> Integer
 part1 code = findY (initialize code) emptyNat
@@ -34,12 +40,18 @@ findY ns nat = fromMaybe (findY ns' nat') (result nat')
 next :: [Interpreter] -> State Nat [Interpreter]
 next ns =
     do
+        -- Get outputs and new interpreter states.
         let osns = map (runState readOutputs) ns
+
+        -- Build input queues
         let queues = foldr addToQueue M.empty . chunksOf 3 $ concatMap fst osns
 
+        -- Get the NAT queue (if any)
         let maybeNatQueue = M.lookup 255 queues
+
+        -- Get the NAT value, if it is in the queue then from the queue else from the NAT.
         nat <- get
-        let natValue = maybe (value nat) (last . chunksOf 2) maybeNatQueue
+        let natValue = maybe (value (trace (show nat) nat)) (last . chunksOf 2) maybeNatQueue
 
         let (queues', newY) = if null queues
             then (M.singleton 0 natValue, Just $ natValue !! 1)
@@ -48,7 +60,8 @@ next ns =
         let newY' = if isJust newY then newY else prevY nat
         put $ cloneNat nat { value = natValue, prevY = newY', result = newResult }
 
-        return $ map (f queues') (zip [0..49] (map snd osns))
+        -- return $ map (f queues') (zip [0..49] (map snd osns))
+        return $ map (f (trace (printf "queues' = %s, oldY = %s, newY = %s, newY' = %s" (show queues') (show $ prevY nat) (show newY) (show newY')) queues')) (zip [0..49] (map snd osns))
 
 f :: M.Map Integer [Integer] -> (Integer, Interpreter) -> Interpreter
 f queues (i, n) = execState (inputs (M.lookup i queues)) n
