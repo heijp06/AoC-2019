@@ -11,7 +11,7 @@ main = do
     print x
     clip x
 
-    putStr "Part two (13163, 20160 are wrong): "
+    putStr "Part two: "
     let y = part2 xs
     print y
     clip y

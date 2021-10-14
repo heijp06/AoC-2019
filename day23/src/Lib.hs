@@ -9,7 +9,6 @@ import Data.Maybe (fromMaybe, isJust, maybe)
 import IntCode (Interpreter, Program, addInputs, empty, fromList, readOutputs, run)
 import Control.Monad.State (State, execState, get, put, runState)
 import qualified Data.Map as M
-import Debug.Trace (trace)
 import Text.Printf (printf)
 
 data Nat = Nat
@@ -44,7 +43,7 @@ next ns =
         let osns = map (runState readOutputs) ns
 
         -- Build input queues
-        let queues = foldr addToQueue M.empty . chunksOf 3 $ concatMap fst osns
+        let queues = foldl addToQueue M.empty . chunksOf 3 $ concatMap fst osns
 
         -- Get the NAT queue (if any)
         let maybeNatQueue = M.lookup 255 queues
@@ -65,9 +64,9 @@ next ns =
 f :: M.Map Integer [Integer] -> (Integer, Interpreter) -> Interpreter
 f queues (i, n) = execState (inputs (M.lookup i queues)) n
 
-addToQueue :: [Integer] -> M.Map Integer [Integer] -> M.Map Integer [Integer]
-addToQueue [addr, x, y] queues = M.insertWith (flip (++)) addr [y] $ M.insertWith (flip (++)) addr [x] queues
-addToQueue xs _ = error $ "Incorrect number of arguments " ++ show xs
+addToQueue :: M.Map Integer [Integer] -> [Integer] -> M.Map Integer [Integer]
+addToQueue queues [addr, x, y] = M.insertWith (flip (++)) addr [y] $ M.insertWith (flip (++)) addr [x] queues
+addToQueue _ xs = error $ "Incorrect number of arguments " ++ show xs
 
 initialize :: [Integer] -> [Interpreter]
 initialize code = map (\i -> execState (doInitialize code i) empty) [0..49]
