@@ -51,7 +51,7 @@ next ns =
 
         -- Get the NAT value, if it is in the queue then from the queue else from the NAT.
         nat <- get
-        let natValue = maybe (value (trace (show nat) nat)) (last . chunksOf 2) maybeNatQueue
+        let natValue = maybe (value nat) (last . chunksOf 2) maybeNatQueue
 
         let (queues', newY) = if null queues
             then (M.singleton 0 natValue, Just $ natValue !! 1)
@@ -60,8 +60,7 @@ next ns =
         let newY' = if isJust newY then newY else prevY nat
         put $ cloneNat nat { value = natValue, prevY = newY', result = newResult }
 
-        -- return $ map (f queues') (zip [0..49] (map snd osns))
-        return $ map (f (trace (printf "queues' = %s, oldY = %s, newY = %s, newY' = %s" (show queues') (show $ prevY nat) (show newY) (show newY')) queues')) (zip [0..49] (map snd osns))
+        return $ map (f queues') (zip [0..49] (map snd osns))
 
 f :: M.Map Integer [Integer] -> (Integer, Interpreter) -> Interpreter
 f queues (i, n) = execState (inputs (M.lookup i queues)) n
