@@ -14,10 +14,10 @@ main = do
     xs <- readCode
     let (output, interpreter) = runState (initialize xs) empty
     mapM_ putStrLn output
-    let interpreter' = execState (runMacro toCheckPoint) interpreter
+    let (output', interpreter') = runState (execAll solution) interpreter
     -- let output' = evalState (tryAll (takeSome takeAll) []) interpreter'
-    mapM_ (f interpreter') (takeSome takeAll)
-    -- mapM_ putStrLn output'
+    -- mapM_ (f interpreter') (takeSome takeAll)
+    mapM_ putStrLn output'
     -- loop interpreter'
     -- putStr "Part one: "
     -- let x = part1 xs
