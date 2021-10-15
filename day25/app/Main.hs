@@ -42,14 +42,18 @@ initialize code = do
 loop :: Interpreter -> IO ()
 loop interpreter = do
     command <- getLine
-    if head command == 'q'
+    if null command
         then
-            return ()
+            loop interpreter
         else
-            do
-                let (output, interpreter') = runState (exec command) interpreter
-                mapM_ putStrLn output
-                loop interpreter'
+            if head command == 'q'
+                then
+                    return ()
+                else
+                    do
+                        let (output, interpreter') = runState (exec command) interpreter
+                        mapM_ putStrLn output
+                        loop interpreter'
 
 exec :: String -> Program [String]
 exec input = do
