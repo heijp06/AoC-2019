@@ -4,7 +4,7 @@ import Lib
 import Utils
 import System.Clipboard (setClipboardString)
 import IntCode (Interpreter, Program, empty, fromList, inputAscii, outputAscii, run)
-import Control.Monad.State (runState)
+import Control.Monad.State (evalState, execState, runState)
 
 main :: IO ()
 main = do
@@ -14,7 +14,11 @@ main = do
     xs <- readCode
     let (output, interpreter) = runState (initialize xs) empty
     mapM_ putStrLn output
-    loop interpreter
+    let interpreter' = execState (runMacro toCheckPoint) interpreter
+    -- let output' = evalState (tryAll (takeSome takeAll) []) interpreter'
+    mapM_ (f interpreter') (takeSome takeAll)
+    -- mapM_ putStrLn output'
+    -- loop interpreter'
     -- putStr "Part one: "
     -- let x = part1 xs
     -- print x
@@ -24,6 +28,12 @@ main = do
     -- let y = part2 xs
     -- print y
     -- clip y
+
+f :: Interpreter -> [String] -> IO ()
+f interpreter some = do
+    let macro = dropAll ++ some ++ ["north"]
+    let output = evalState (execAll macro) interpreter
+    mapM_ putStrLn output
 
 clip :: Show a => a -> IO ()
 clip = setClipboardString . show
@@ -55,8 +65,116 @@ loop interpreter = do
                         mapM_ putStrLn output
                         loop interpreter'
 
+tryAll :: [[String]] -> [String] -> Program [String]
+tryAll [] output = return output
+tryAll (x:xs) output = do
+    runMacro dropAll
+    output' <- execAll ("inv":x ++ ["north"])
+    tryAll xs (output' ++  output)
+
 exec :: String -> Program [String]
 exec input = do
-    inputAscii [input]
+    execAll [input]
+
+execAll :: [String] -> Program [String]
+execAll xs = do
+    inputAscii xs
     run
     outputAscii
+
+runMacro :: [String] -> Program ()
+runMacro [] = return ()
+runMacro (x:xs) = do
+    exec x
+    runMacro xs
+
+solution :: [String]
+solution =
+    [ "south"
+    , "take monolith"
+    , "east"
+    , "take asterisk"
+    , "west"
+    , "north"
+    -- , "west"
+    -- , "take coin"
+    -- , "north"
+    -- , "east"
+    -- , "take astronaut ice cream"
+    -- , "west"
+    -- , "south"
+    -- , "east"
+    , "north"
+    , "north"
+    -- , "take mutex"
+    , "west"
+    , "take astrolabe"
+    , "west"
+    -- , "take dehydrated water"
+    , "west"
+    , "take wreath"
+    , "east"
+    , "south"
+    , "east"
+    , "north"
+    , "north"
+    ]
+
+toCheckPoint :: [String]
+toCheckPoint =
+    [ "south"
+    , "take monolith"
+    , "east"
+    , "take asterisk"
+    , "west"
+    , "north"
+    , "west"
+    , "take coin"
+    , "north"
+    , "east"
+    , "take astronaut ice cream"
+    , "west"
+    , "south"
+    , "east"
+    , "north"
+    , "north"
+    , "take mutex"
+    , "west"
+    , "take astrolabe"
+    , "west"
+    , "take dehydrated water"
+    , "west"
+    , "take wreath"
+    , "east"
+    , "south"
+    , "east"
+    , "north"
+    ]
+
+dropAll :: [String]
+dropAll =
+    [ "drop monolith"
+    , "drop asterisk"
+    , "drop coin"
+    , "drop astronaut ice cream"
+    , "drop mutex"
+    , "drop astrolabe"
+    , "drop dehydrated water"
+    , "drop wreath"
+    ]
+
+takeAll :: [String]
+takeAll =
+    [ "take monolith"
+    , "take asterisk"
+    , "take coin"
+    , "take astronaut ice cream"
+    , "take mutex"
+    , "take astrolabe"
+    , "take dehydrated water"
+    , "take wreath"
+    ]
+
+takeSome :: [String] -> [[String]]
+takeSome [] = [[]]
+takeSome (x:xs) = let some = takeSome xs in some ++ (map (x:) some)
